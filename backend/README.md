@@ -5,6 +5,7 @@ This FastAPI application has been refactored following the **Model-Controller-Re
 ## Architecture Overview
 
 ### 📁 File Structure
+
 ```
 backend/
 ├── main.py          # FastAPI application entry point
@@ -20,6 +21,7 @@ backend/
 ### 🏗️ Pattern Explanation
 
 #### 1. **Model Layer** (`model.py`)
+
 - **Purpose**: Defines data structures
 - **Contains**:
   - `PurchaseDB`: SQLAlchemy database model
@@ -28,6 +30,7 @@ backend/
   - `PurchaseSearchParams`: Pydantic model for search parameters
 
 #### 2. **Repository Layer** (`repository.py`)
+
 - **Purpose**: Data access operations
 - **Responsibilities**:
   - Database CRUD operations
@@ -40,6 +43,7 @@ backend/
   - `delete_purchase()`: Remove purchase
 
 #### 3. **Service Layer** (`service.py`)
+
 - **Purpose**: Business logic and coordination
 - **Responsibilities**:
   - File handling (upload/deletion)
@@ -53,6 +57,7 @@ backend/
   - `delete_purchase()`: Remove purchase + associated file
 
 #### 4. **Controller Layer** (`controller.py`)
+
 - **Purpose**: HTTP request/response handling
 - **Responsibilities**:
   - Request validation
@@ -66,6 +71,7 @@ backend/
   - `DELETE /purchase/{id}`: Delete purchase
 
 #### 5. **Database Layer** (`database.py`)
+
 - **Purpose**: Database configuration
 - **Contains**:
   - Database connection setup
@@ -75,21 +81,25 @@ backend/
 ## 🎯 Benefits of This Architecture
 
 ### ✅ **Separation of Concerns**
+
 - Each layer has a single responsibility
 - Easy to test individual components
 - Clear dependency flow: Controller → Service → Repository → Database
 
 ### ✅ **Maintainability**
+
 - Changes in one layer don't affect others
 - Easy to add new features
 - Simple to modify business logic
 
 ### ✅ **Testability**
+
 - Each layer can be unit tested independently
 - Easy to mock dependencies
 - Clear interfaces between layers
 
 ### ✅ **Scalability**
+
 - Easy to add new endpoints
 - Simple to extend business logic
 - Can easily switch database implementations

@@ -5,6 +5,7 @@ This Streamlit frontend application has been refactored following a **clean arch
 ## 🏗️ Architecture Overview
 
 ### 📁 File Structure
+
 ```
 frontend/
 ├── app.py           # Application entry point
@@ -21,6 +22,7 @@ frontend/
 ### 🎯 Architecture Pattern
 
 #### 1. **Configuration Layer** (`config.py`)
+
 - **Purpose**: Centralized configuration management
 - **Contains**:
   - API endpoints and URLs
@@ -29,6 +31,7 @@ frontend/
   - Environment-specific settings
 
 #### 2. **Model Layer** (`models.py`)
+
 - **Purpose**: Data structures and DTOs
 - **Contains**:
   - `PurchaseData`: Purchase information model
@@ -37,6 +40,7 @@ frontend/
   - Data transformation methods
 
 #### 3. **Service Layer** (`services.py`)
+
 - **Purpose**: External API communication
 - **Responsibilities**:
   - HTTP requests to backend API
@@ -45,6 +49,7 @@ frontend/
   - Data serialization/deserialization
 
 #### 4. **Component Layer** (`components.py`)
+
 - **Purpose**: Reusable UI components
 - **Contains**:
   - Form components with validation
@@ -54,6 +59,7 @@ frontend/
   - Export functionality
 
 #### 5. **Page Layer** (`pages.py`)
+
 - **Purpose**: Page logic and state management
 - **Responsibilities**:
   - Coordinating UI components
@@ -62,6 +68,7 @@ frontend/
   - Business logic for the UI
 
 #### 6. **Utility Layer** (`utils.py`)
+
 - **Purpose**: Common utility functions
 - **Contains**:
   - Validation utilities
@@ -72,6 +79,7 @@ frontend/
 ## 🎨 Key Features
 
 ### ✨ **Enhanced User Experience**
+
 - **Modern UI**: Clean, intuitive interface with emojis and proper spacing
 - **Real-time Validation**: Client-side validation with immediate feedback
 - **Responsive Design**: Works well on different screen sizes
@@ -79,18 +87,21 @@ frontend/
 - **Success Animations**: Celebration effects for successful operations
 
 ### 🔒 **Data Validation**
+
 - **Codice Fiscale**: Italian tax code format validation
 - **Credit Card**: Basic credit card number validation
 - **File Upload**: Size and type validation for receipts
 - **Form Fields**: Comprehensive field validation with helpful error messages
 
 ### 📊 **Advanced Features**
+
 - **Export Options**: CSV export and text summary generation
 - **Search Filters**: Multiple search criteria with clear/reset functionality
 - **Bulk Operations**: Delete operations with confirmation dialogs
 - **Session Management**: Persistent search results and state
 
 ### 🛡️ **Error Handling**
+
 - **Graceful Degradation**: Proper error handling with user-friendly messages
 - **Network Resilience**: Connection error handling and retry suggestions
 - **Validation Feedback**: Clear validation messages with specific guidance
@@ -98,6 +109,7 @@ frontend/
 ## 🎮 User Interface Components
 
 ### 📤 **Upload Form**
+
 - Two-column layout for better organization
 - Real-time field validation
 - File size and type checking
@@ -105,6 +117,7 @@ frontend/
 - Success animations
 
 ### 🔍 **Search Interface**
+
 - Expandable search filters
 - Multiple search criteria
 - Clear and reset functionality
@@ -112,12 +125,14 @@ frontend/
 - Export options
 
 ### 📋 **Results Display**
+
 - Card-based layout for purchases
 - Formatted data display (currency, dates, masked cards)
 - Action buttons (delete with confirmation)
 - Pagination support (future enhancement)
 
 ### 📊 **Export Features**
+
 - CSV download for spreadsheet analysis
 - Text summary with statistics
 - Copy-to-clipboard functionality
@@ -125,21 +140,25 @@ frontend/
 ## 🔧 Technical Improvements
 
 ### ✅ **Separation of Concerns**
+
 - Clear separation between UI, business logic, and data access
 - Reusable components for consistent UI
 - Centralized configuration management
 
 ### ✅ **Maintainability**
+
 - Modular code structure
 - Easy to add new features or modify existing ones
 - Clear naming conventions and documentation
 
 ### ✅ **Performance**
+
 - Efficient state management
 - Optimized re-rendering
 - Lazy loading where appropriate
 
 ### ✅ **User Experience**
+
 - Intuitive navigation
 - Immediate feedback
 - Professional appearance
@@ -148,6 +167,7 @@ frontend/
 ## 🚀 Usage Examples
 
 ### Adding a New Feature
+
 To add a new feature (e.g., purchase statistics), follow this pattern:
 
 1. **Add configuration** (if needed) in `config.py`
@@ -158,6 +178,7 @@ To add a new feature (e.g., purchase statistics), follow this pattern:
 6. **Update main app** in `app.py`
 
 ### Customizing the UI
+
 - Modify `config.py` for basic settings (titles, colors, limits)
 - Update `components.py` for UI elements
 - Change `utils.py` for formatting and validation rules
@@ -165,20 +186,24 @@ To add a new feature (e.g., purchase statistics), follow this pattern:
 ## 🎯 Benefits of Refactoring
 
 ### 🔄 **From Monolithic to Modular**
+
 - **Before**: Single file with mixed concerns
 - **After**: Organized modules with specific responsibilities
 
 ### 🧪 **Better Testability**
+
 - Each component can be tested independently
 - Clear interfaces between layers
 - Mocking capabilities for external dependencies
 
 ### 🔧 **Enhanced Maintainability**
+
 - Easy to locate and fix issues
 - Simple to add new features
 - Clear code organization
 
 ### 🚀 **Improved Scalability**
+
 - Easy to add new pages or features
 - Reusable components
 - Configurable settings
@@ -186,18 +211,21 @@ To add a new feature (e.g., purchase statistics), follow this pattern:
 ## 🛠️ Development Guidelines
 
 ### Adding New Components
+
 1. Create component in `components.py`
 2. Add proper typing and documentation
 3. Include validation where appropriate
 4. Follow the established UI patterns
 
 ### Error Handling
+
 - Always handle API errors gracefully
 - Provide user-friendly error messages
 - Include retry options where appropriate
 - Log errors for debugging
 
 ### Validation
+
 - Use the `ValidationUtils` class for consistency
 - Validate on both client and server side
 - Provide clear, helpful error messages
