@@ -1,0 +1,6 @@
+Hello World!
+
+This is a sample file uploaded to the GCS bucket via Terraform.
+You can access this file publicly using the bucket's public URL.
+
+Created on: July 12, 2025

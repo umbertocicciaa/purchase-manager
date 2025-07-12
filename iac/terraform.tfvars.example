@@ -1,0 +1,22 @@
+# Example Terraform variables file
+# Copy this file to terraform.tfvars and update with your actual values
+
+# Your GCP Project ID
+project_id = "your-gcp-project-id"
+
+# GCP Region
+region = "us-central1"
+
+# Bucket name (must be globally unique)
+bucket_name = "your-unique-bucket-name-12345"
+
+# Bucket location (can be region-specific or multi-region)
+bucket_location = "US"
+
+# Database configuration
+db_instance_name = "my-postgres-instance"
+db_version = "POSTGRES_15"
+db_tier = "db-f1-micro"  # Use db-custom-1-3840 for production
+db_disk_size = 20
+db_name = "my_app_database"
+db_user = "app_user"
