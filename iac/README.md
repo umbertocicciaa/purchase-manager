@@ -4,6 +4,7 @@ This Terraform configuration creates:
 
 - A public Google Cloud Storage bucket
 - A PostgreSQL database (Cloud SQL)
+- A container registry (Artifact Registry)
 
 ## Prerequisites
 
@@ -83,6 +84,9 @@ This Terraform configuration creates:
 - **PostgreSQL Database**: Cloud SQL PostgreSQL instance with automatic backups
 - **Database User**: Application user with generated password
 - **Database**: Application database ready for use
+- **Container Registry**: Artifact Registry for storing Docker images
+- **Registry Service Account**: Service account for CI/CD pipeline access
+- **Cleanup Policies**: Automatic cleanup of old container images
 
 ## Accessing your resources
 
@@ -114,6 +118,56 @@ psql "postgresql://USERNAME:PASSWORD@PUBLIC_IP:5432/DATABASE_NAME"
 ```
 
 You can also connect from your applications using the connection string provided in the outputs.
+
+### Container Registry
+
+To use the container registry, first authenticate Docker with Google Cloud:
+
+```bash
+# Configure Docker to use gcloud as a credential helper
+gcloud auth configure-docker LOCATION-docker.pkg.dev
+
+# Get the registry URL
+terraform output registry_url
+
+# Build and tag your image
+docker build -t REGISTRY_URL/your-app:latest .
+
+# Push the image
+docker push REGISTRY_URL/your-app:latest
+
+# Pull the image
+docker pull REGISTRY_URL/your-app:latest
+```
+
+For CI/CD pipelines, use the service account key:
+
+```bash
+# Get the service account key (base64 encoded)
+terraform output registry_service_account_key
+
+# Decode and save to file
+echo "$(terraform output -raw registry_service_account_key)" | base64 -d > key.json
+
+# Authenticate using the service account
+gcloud auth activate-service-account --key-file=key.json
+```
+
+**Helper Script**: A `registry-helper.sh` script is provided for common registry operations:
+
+```bash
+# Make the script executable
+chmod +x registry-helper.sh
+
+# Build and push an image
+./registry-helper.sh build my-app latest
+
+# Pull an image
+./registry-helper.sh pull my-app latest
+
+# List all images
+./registry-helper.sh list
+```
 
 ## Cleanup
 
@@ -150,3 +204,11 @@ You can modify the following in `main.tf`:
 - Backup retention settings
 - Network access restrictions
 - Database flags and configuration
+
+**Container Registry:**
+
+- Image retention policies
+- Cleanup schedules
+- IAM permissions
+- Repository format (Docker, Maven, npm, etc.)
+- Immutable tags setting

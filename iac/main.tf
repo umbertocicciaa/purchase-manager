@@ -123,3 +123,65 @@ resource "google_sql_user" "db_user" {
   instance = google_sql_database_instance.postgres_instance.name
   password = random_password.db_password.result
 }
+
+# Create Artifact Registry repository for container images
+resource "google_artifact_registry_repository" "container_registry" {
+  location      = var.region
+  repository_id = var.registry_name
+  description   = "Container registry for application images"
+  format        = "DOCKER"
+
+  docker_config {
+    immutable_tags = false
+  }
+
+  cleanup_policies {
+    id     = "delete-old-images"
+    action = "DELETE"
+    
+    condition {
+      tag_state  = "UNTAGGED"
+      older_than = "2592000s" # 30 days
+    }
+  }
+
+  cleanup_policies {
+    id     = "keep-minimum-versions"
+    action = "KEEP"
+    
+    most_recent_versions {
+      keep_count = var.registry_keep_count
+    }
+  }
+}
+
+# IAM binding for the registry - allow project members to push/pull
+resource "google_artifact_registry_repository_iam_member" "registry_admin" {
+  project    = var.project_id
+  location   = google_artifact_registry_repository.container_registry.location
+  repository = google_artifact_registry_repository.container_registry.name
+  role       = "roles/artifactregistry.admin"
+  member     = "serviceAccount:${var.project_id}@appspot.gserviceaccount.com"
+}
+
+# Optional: Create a service account for CI/CD pipeline
+resource "google_service_account" "registry_service_account" {
+  account_id   = var.registry_service_account_name
+  display_name = "Container Registry Service Account"
+  description  = "Service account for pushing images to container registry"
+}
+
+# Grant the service account permission to push to the registry
+resource "google_artifact_registry_repository_iam_member" "registry_writer" {
+  project    = var.project_id
+  location   = google_artifact_registry_repository.container_registry.location
+  repository = google_artifact_registry_repository.container_registry.name
+  role       = "roles/artifactregistry.writer"
+  member     = "serviceAccount:${google_service_account.registry_service_account.email}"
+}
+
+# Create and download service account key (for CI/CD)
+resource "google_service_account_key" "registry_key" {
+  service_account_id = google_service_account.registry_service_account.name
+  public_key_type    = "TYPE_X509_PEM_FILE"
+}

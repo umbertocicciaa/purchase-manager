@@ -60,3 +60,22 @@ variable "db_user" {
   type        = string
   default     = "app_user"
 }
+
+# Container Registry configuration
+variable "registry_name" {
+  description = "Name of the Artifact Registry repository"
+  type        = string
+  default     = "app-registry"
+}
+
+variable "registry_keep_count" {
+  description = "Number of recent images to keep in the registry"
+  type        = number
+  default     = 10
+}
+
+variable "registry_service_account_name" {
+  description = "Name of the service account for container registry access"
+  type        = string
+  default     = "registry-sa"
+}

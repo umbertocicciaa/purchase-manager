@@ -20,3 +20,8 @@ db_tier = "db-f1-micro"  # Use db-custom-1-3840 for production
 db_disk_size = 20
 db_name = "my_app_database"
 db_user = "app_user"
+
+# Container Registry configuration
+registry_name = "my-app-registry"
+registry_keep_count = 10
+registry_service_account_name = "registry-service-account"
