@@ -3,7 +3,7 @@ from sqlalchemy.orm import sessionmaker
 from model import Base
 import os
 
-DATABASE_URL = "postgresql://postgres:postgres@postgres-db:5432/appdb"
+DATABASE_URL = os.environ.get("DATABASE_URL", "postgresql://postgres:postgres@postgres-db:5432/appdb")
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
