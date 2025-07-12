@@ -1,0 +1,99 @@
+name: Deploy Frontend Docker Image
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'frontend/**'
+      - '.github/workflows/deploy-frontend.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'frontend/**'
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  REGISTRY_LOCATION: ${{ secrets.GCP_REGISTRY_LOCATION }}
+  REGISTRY_NAME: ${{ secrets.GCP_REGISTRY_NAME }}
+  IMAGE_NAME: frontend
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Google Cloud SDK
+      uses: google-github-actions/setup-gcloud@v2
+      with:
+        version: 'latest'
+
+    - name: Authenticate to Google Cloud
+      uses: google-github-actions/auth@v2
+      with:
+        credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+    - name: Configure Docker to use gcloud as credential helper
+      run: |
+        gcloud auth configure-docker ${{ env.REGISTRY_LOCATION }}-docker.pkg.dev
+
+    - name: Get short SHA
+      id: sha
+      run: echo "SHORT_SHA=${GITHUB_SHA::8}" >> $GITHUB_OUTPUT
+
+    - name: Build Docker image
+      run: |
+        cd frontend
+        docker build \
+          --tag ${{ env.REGISTRY_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REGISTRY_NAME }}/${{ env.IMAGE_NAME }}:${{ steps.sha.outputs.SHORT_SHA }} \
+          --tag ${{ env.REGISTRY_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REGISTRY_NAME }}/${{ env.IMAGE_NAME }}:latest \
+          .
+
+    - name: Push Docker image
+      run: |
+        docker push ${{ env.REGISTRY_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REGISTRY_NAME }}/${{ env.IMAGE_NAME }}:${{ steps.sha.outputs.SHORT_SHA }}
+        docker push ${{ env.REGISTRY_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REGISTRY_NAME }}/${{ env.IMAGE_NAME }}:latest
+
+    - name: Deploy to Cloud Run (Optional)
+      id: deploy
+      run: |
+        gcloud run deploy frontend-app \
+          --image ${{ env.REGISTRY_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REGISTRY_NAME }}/${{ env.IMAGE_NAME }}:${{ steps.sha.outputs.SHORT_SHA }} \
+          --platform managed \
+          --region ${{ env.REGISTRY_LOCATION }} \
+          --allow-unauthenticated \
+          --port 8501 \
+          --memory 512Mi \
+          --cpu 1 \
+          --max-instances 10 \
+          --set-env-vars="ENVIRONMENT=production"
+
+    - name: Show deployment URL
+      run: |
+        echo "Frontend deployed to: $(gcloud run services describe frontend-app --region=${{ env.REGISTRY_LOCATION }} --format='value(status.url)')"
+
+    - name: Comment deployment info on PR
+      if: github.event_name == 'pull_request'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const deploymentUrl = `$(gcloud run services describe frontend-app --region=${{ env.REGISTRY_LOCATION }} --format='value(status.url)')`;
+          const comment = `🚀 **Frontend Deployment**
+          
+          **Docker Image:** \`${{ env.REGISTRY_LOCATION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.REGISTRY_NAME }}/${{ env.IMAGE_NAME }}:${{ steps.sha.outputs.SHORT_SHA }}\`
+          **Deployment URL:** ${deploymentUrl}
+          **Commit:** ${context.sha.slice(0, 8)}
+          `;
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          });
