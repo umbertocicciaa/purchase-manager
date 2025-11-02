@@ -2,6 +2,11 @@
 
 A full-stack web application for managing customer purchases with receipt uploads, built with **FastAPI**, **Streamlit**, and **PostgreSQL**.
 
+![H](static/homepage.jpeg)
+![H](static/homepag2.jpeg)
+![H](static/purchase-management.jpeg)
+![H](static/purchase-management2.jpeg)
+
 ## 📋 Table of Contents
 
 - [Features](#-features)
